@@ -1,1 +1,265 @@
-
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<title>AI在庫エージェント</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;font-family:'Meiryo','Yu Gothic',sans-serif}
+body{background:#f0f2f5;font-size:13px}
+.root{display:grid;grid-template-columns:1fr 300px;height:100vh}
+.main{display:flex;flex-direction:column;border-right:1px solid #c8d0d8}
+.titlebar{background:#185FA5;color:#fff;padding:8px 14px;display:flex;align-items:center;justify-content:space-between}
+.ai-status{display:flex;align-items:center;gap:6px;font-size:11px;background:rgba(255,255,255,0.15);padding:3px 10px;border-radius:20px}
+.ai-dot{width:7px;height:7px;border-radius:50%;background:#5DCAA5}
+.ai-dot.thinking{background:#EF9F27;animation:pulse 1s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.3}}
+.metrics{display:grid;grid-template-columns:repeat(4,1fr);background:#fff;border-bottom:1px solid #dde}
+.metric{padding:10px 12px;border-right:1px solid #dde;text-align:center}
+.metric-label{font-size:11px;color:#666;margin-bottom:3px}
+.metric-val{font-size:18px;font-weight:bold}
+.ok{color:#1D9E75}.warn{color:#BA7517}.danger{color:#E24B4A}.ai-color{color:#534AB7}
+.toolbar{background:#e8edf2;border-bottom:1px solid #c8d0d8;padding:5px 10px;display:flex;gap:5px;flex-wrap:wrap}
+.btn{background:#fff;border:1px solid #aab;border-radius:3px;padding:3px 10px;font-size:12px;cursor:pointer}
+.btn-ai{background:#534AB7;color:#fff;border-color:#534AB7}
+.section-hd{background:#e8edf2;padding:5px 10px;font-size:11px;font-weight:bold;color:#444;border-bottom:1px solid #dde;display:flex;justify-content:space-between}
+table{width:100%;border-collapse:collapse}
+th{background:#0C447C;color:#fff;padding:4px 7px;font-size:11px;text-align:center;border-right:1px solid #185FA5}
+td{padding:4px 7px;font-size:12px;border-bottom:1px solid #dde;border-right:1px solid #dde;color:#222;cursor:pointer}
+tr:hover td{background:#e8f0ff}
+tr.warn-row td{background:#fff8e8}
+tr.danger-row td{background:#fff0f0}
+tr.selected td{background:#daeaff;outline:2px solid #185FA5;outline-offset:-1px}
+.num{text-align:right}.ct{text-align:center}
+.badge{display:inline-block;padding:2px 6px;border-radius:3px;font-size:10px;font-weight:bold}
+.b-ok{background:#c6efce;color:#276221}
+.b-warn{background:#ffeb9c;color:#9c6500}
+.b-danger{background:#ffc7ce;color:#9c0006}
+.b-ai{background:#eeedf8;color:#26215C}
+.bar-wrap{background:#ddd;border-radius:2px;height:5px;width:60px;overflow:hidden;display:inline-block;vertical-align:middle}
+.bar-fill{height:5px;border-radius:2px}
+.ai-panel{display:flex;flex-direction:column;background:#f8f7ff}
+.ai-header{background:#26215C;color:#fff;padding:8px 14px;display:flex;align-items:center;gap:8px}
+.ai-icon{width:24px;height:24px;border-radius:50%;background:#534AB7;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:bold;color:#fff;flex-shrink:0}
+.chat-area{flex:1;overflow-y:auto;padding:8px;display:flex;flex-direction:column;gap:6px;min-height:300px}
+.msg{max-width:92%;padding:7px 10px;border-radius:6px;font-size:12px;line-height:1.5}
+.msg-ai{background:#fff;border:1px solid #dde;align-self:flex-start;color:#222}
+.msg-user{background:#185FA5;color:#fff;align-self:flex-end}
+.msg-system{background:#eeedf8;border:1px solid #aba9e8;color:#26215C;align-self:stretch;font-size:11px}
+.msg-warn{background:#fff8e8;border:1px solid #ffeb9c;color:#633806;align-self:stretch;font-size:11px}
+.msg-label{font-size:10px;color:#888;margin-bottom:2px}
+.action-row{display:flex;gap:5px;flex-wrap:wrap;margin-top:5px}
+.act-btn{background:#fff;border:1px solid #aab;border-radius:20px;padding:2px 8px;font-size:11px;cursor:pointer;color:#185FA5}
+.act-btn:hover{background:#e8f0ff}
+.input-area{padding:8px;border-top:1px solid #dde;background:#fff}
+.quick-btns{display:flex;gap:4px;flex-wrap:wrap;margin-bottom:6px}
+.qbtn{background:#f0eeff;border:1px solid #aba9e8;border-radius:20px;padding:3px 9px;font-size:11px;cursor:pointer;color:#3C3489}
+.qbtn:hover{background:#eeedf8}
+.chat-row{display:flex;gap:6px;align-items:center}
+.chat-input{flex:1;padding:5px 10px;border:1px solid #aab;border-radius:20px;font-size:12px}
+.send-btn{background:#185FA5;color:#fff;border:none;border-radius:50%;width:28px;height:28px;cursor:pointer;font-size:14px;flex-shrink:0}
+.thinking{display:flex;align-items:center;gap:6px;padding:6px 10px;font-size:11px;color:#534AB7;background:#eeedf8;border-radius:6px;align-self:flex-start}
+.dots span{animation:blink 1.2s infinite;font-size:16px}
+.dots span:nth-child(2){animation-delay:0.2s}
+.dots span:nth-child(3){animation-delay:0.4s}
+@keyframes blink{0%,80%,100%{opacity:0}40%{opacity:1}}
+</style>
+</head>
+<body>
+<div class="root">
+<div class="main">
+  <div class="titlebar">
+    <span style="font-size:13px;font-weight:bold">AI在庫・仕入モニタリングダッシュボード</span>
+    <div style="display:flex;gap:8px;align-items:center">
+      <div class="ai-status"><div class="ai-dot" id="ai-dot"></div><span id="ai-status-text">AIエージェント 稼働中</span></div>
+      <span style="font-size:11px;opacity:0.7">2026/04/10 14:32</span>
+    </div>
+  </div>
+  <div class="metrics">
+    <div class="metric"><div class="metric-label">在庫不足アラート</div><div class="metric-val danger">3件</div></div>
+    <div class="metric"><div class="metric-label">発注点以下</div><div class="metric-val warn">7件</div></div>
+    <div class="metric"><div class="metric-label">AI推奨発注</div><div class="metric-val ok">5件</div></div>
+    <div class="metric"><div class="metric-label">仕入単価異常</div><div class="metric-val warn">2件</div></div>
+  </div>
+  <div class="toolbar">
+    <button class="btn btn-ai" onclick="runScan()">AI全体スキャン実行</button>
+    <button class="btn" onclick="filterDanger()">危険品目のみ</button>
+    <button class="btn" onclick="filterAll()">全件表示</button>
+    <span style="margin-left:auto;font-size:11px;color:#666">行をクリックでAI即時分析</span>
+  </div>
+  <div class="section-hd"><span>在庫状況一覧（AIフラグ付き）</span><span id="scan-label" style="color:#534AB7;font-size:11px"></span></div>
+  <div style="overflow-x:auto;flex:1">
+  <table>
+    <thead><tr>
+      <th style="width:68px">品番</th><th style="width:150px">品名</th>
+      <th style="width:52px">現在庫</th><th style="width:52px">受注残</th>
+      <th style="width:52px">引当可</th><th style="width:52px">発注点</th>
+      <th style="width:80px">在庫率</th><th style="width:80px">AIステータス</th>
+    </tr></thead>
+    <tbody id="inv-body"></tbody>
+  </table>
+  </div>
+  <div class="section-hd" style="border-top:1px solid #dde"><span>仕入単価チェック（直近3ヶ月比較）</span><span style="font-size:11px;color:#BA7517">異常検知: 2件</span></div>
+  <div style="overflow-x:auto">
+  <table>
+    <thead><tr>
+      <th style="width:68px">品番</th><th style="width:150px">品名</th>
+      <th style="width:64px">1月前</th><th style="width:64px">2月前</th>
+      <th style="width:64px">今回</th><th style="width:56px">変動</th><th style="width:88px">AI判定</th>
+    </tr></thead>
+    <tbody id="price-body"></tbody>
+  </table>
+  </div>
+</div>
+<div class="ai-panel">
+  <div class="ai-header">
+    <div class="ai-icon">AI</div>
+    <div><div style="font-size:12px;font-weight:bold">在庫・仕入 AIエージェント</div><div style="font-size:10px;opacity:0.7">予測・異常検知・発注提案</div></div>
+  </div>
+  <div class="chat-area" id="chat-area"></div>
+  <div class="input-area">
+    <div class="quick-btns">
+      <button class="qbtn" onclick="quickAsk('在庫不足品目を教えて')">在庫不足</button>
+      <button class="qbtn" onclick="quickAsk('発注提案を出して')">発注提案</button>
+      <button class="qbtn" onclick="quickAsk('単価異常を説明して')">単価異常</button>
+      <button class="qbtn" onclick="quickAsk('今月の仕入予測は？')">仕入予測</button>
+    </div>
+    <div class="chat-row">
+      <input class="chat-input" id="chat-input" placeholder="AIに質問する..." onkeydown="if(event.key==='Enter')sendMsg()">
+      <button class="send-btn" onclick="sendMsg()">&#x27A4;</button>
+    </div>
+  </div>
+</div>
+</div>
+<script>
+const inv=[
+  {code:'A-1045',name:'業務用クリーナーEX 5L',stock:280,order:50,safety:200,reorder:100,ai:'normal'},
+  {code:'B-2310',name:'除菌スプレー詰替 2L×6',stock:12,order:20,safety:100,reorder:30,ai:'warn'},
+  {code:'C-0077',name:'ウェットティッシュ業務用',stock:156,order:30,safety:120,reorder:60,ai:'normal'},
+  {code:'D-5521',name:'アルコール消毒液 1L',stock:0,order:100,safety:300,reorder:80,ai:'danger'},
+  {code:'E-3301',name:'ポリ手袋 M 100枚×20箱',stock:45,order:10,safety:80,reorder:25,ai:'warn'},
+];
+const prices=[
+  {code:'B-2310',name:'除菌スプレー詰替 2L×6',p1:3200,p2:3180,now:3750,ai:'danger'},
+  {code:'D-5521',name:'アルコール消毒液 1L',p1:620,p2:625,now:820,ai:'danger'},
+  {code:'A-1045',name:'業務用クリーナーEX 5L',p1:1480,p2:1490,now:1490,ai:'normal'},
+  {code:'C-0077',name:'ウェットティッシュ業務用',p1:4100,p2:4150,now:4200,ai:'normal'},
+];
+const responses={
+  '在庫不足品目を教えて':[
+    {t:'system',tx:'在庫データを分析しています...'},
+    {t:'ai',tx:'在庫不足を2品目検知しました：\n\n▸ D-5521 アルコール消毒液 1L\n　現在庫: 0本、受注残: 100本\n　→ 即時発注が必要です\n\n▸ B-2310 除菌スプレー詰替\n　現在庫: 12箱（発注点30箱以下）\n　→ 今週中の発注を推奨します',ac:['D-5521を今すぐ発注','B-2310の詳細を見る']}
+  ],
+  '発注提案を出して':[
+    {t:'system',tx:'出荷トレンドと在庫水準を分析中...'},
+    {t:'ai',tx:'AI発注提案（5品目）：\n\n1. D-5521 アルコール消毒液\n　推奨数量: 300本\n　推奨仕入先: 中部ケミカル(¥625)\n　※山田商事は¥820で割高です\n\n2. B-2310 除菌スプレー\n　推奨数量: 80箱\n　来月の受注増加を予測\n\n3. E-3301 ポリ手袋\n　推奨数量: 40ケース',ac:['一括発注書を作成','仕入先比較を見る']}
+  ],
+  '単価異常を説明して':[
+    {t:'warn',tx:'仕入単価の異常を2件検知しています'},
+    {t:'ai',tx:'単価異常分析：\n\n▸ D-5521 アルコール消毒液\n　2ヶ月前: ¥620 → 今回: ¥820\n　変動率: +32.3%（正常範囲±5%超過）\n　→ 複数社から見積取得を推奨\n\n▸ B-2310 除菌スプレー\n　2ヶ月前: ¥3,180 → 今回: ¥3,750\n　変動率: +17.9%\n　→ 前回単価での再交渉を推奨',ac:['代替仕入先を検索','見積依頼書を作成']}
+  ],
+  '今月の仕入予測は？':[
+    {t:'system',tx:'出荷実績・受注残・季節トレンドを統合分析中...'},
+    {t:'ai',tx:'今月（4月）の仕入予測：\n\n推定仕入総額: ¥1,840,000〜¥2,100,000\n（先月比: +12〜+23%）\n\n主な増加要因：\n▸ アルコール系製品の需要増\n▸ D-5521の緊急発注\n▸ B-2310の単価上昇(+17.9%)\n\n推奨: 単価上昇品目の代替仕入先を今週中に確保してください',ac:['仕入予算を確認','代替仕入先リスト']}
+  ],
+};
+let thinking=false;
+function renderInv(filter){
+  const b=document.getElementById('inv-body');b.innerHTML='';
+  inv.filter(r=>filter?r.ai===filter:true).forEach(r=>{
+    const avail=Math.max(0,r.stock-r.order);
+    const rate=Math.round(r.stock/r.safety*100);
+    const cls=r.ai==='danger'?'danger-row':r.ai==='warn'?'warn-row':'';
+    const bc=r.ai==='danger'?'b-danger':r.ai==='warn'?'b-warn':'b-ok';
+    const bt=r.ai==='danger'?'危険':r.ai==='warn'?'要注意':'正常';
+    const bw=Math.min(100,rate);
+    const bc2=rate>=80?'#1D9E75':rate>=30?'#EF9F27':'#E24B4A';
+    const tr=document.createElement('tr');
+    tr.className=cls;
+    tr.onclick=()=>selectRow(tr,r);
+    tr.innerHTML=`<td style="color:#185FA5;font-size:11px">${r.code}</td><td style="font-size:11px">${r.name}</td><td class="ct" style="${r.stock===0?'color:#E24B4A;font-weight:bold':''}">${r.stock}</td><td class="ct">${r.order}</td><td class="ct" style="${avail===0?'color:#E24B4A;font-weight:bold':'color:#1D9E75'}">${avail}</td><td class="ct">${r.reorder}</td><td class="ct"><span style="font-size:11px;color:${bc2}">${rate}%</span><div class="bar-wrap"><div class="bar-fill" style="width:${bw}%;background:${bc2}"></div></div></td><td class="ct"><span class="badge ${bc}">${bt}</span></td>`;
+    b.appendChild(tr);
+  });
+}
+function renderPrices(){
+  const b=document.getElementById('price-body');b.innerHTML='';
+  prices.forEach(r=>{
+    const chg=Math.round((r.now-r.p1)/r.p1*100);
+    const cls=r.ai==='danger'?'danger-row':'';
+    const bc=r.ai==='danger'?'b-danger':'b-ok';
+    const bt=r.ai==='danger'?'異常検知':'正常範囲';
+    b.innerHTML+=`<tr class="${cls}"><td style="color:#185FA5;font-size:11px">${r.code}</td><td style="font-size:11px">${r.name}</td><td class="num">¥${r.p1.toLocaleString()}</td><td class="num">¥${r.p2.toLocaleString()}</td><td class="num" style="${r.ai==='danger'?'color:#E24B4A;font-weight:bold':''}"">¥${r.now.toLocaleString()}</td><td class="ct" style="color:${chg>10?'#E24B4A':chg>2?'#BA7517':'#1D9E75'}">${chg>0?'+':''}${chg}%</td><td class="ct"><span class="badge ${bc}">${bt}</span></td></tr>`;
+  });
+}
+function selectRow(tr,item){
+  document.querySelectorAll('#inv-body tr').forEach(r=>r.classList.remove('selected'));
+  tr.classList.add('selected');
+  addMsg('system',`${item.code} ${item.name} を選択。AI分析を開始します...`);
+  setTimeout(()=>{
+    const avail=Math.max(0,item.stock-item.order);
+    let tx=`【${item.code} 分析レポート】\n\n`;
+    if(item.ai==='danger'){tx+=`深刻な在庫不足を検知。\n現在庫: ${item.stock}　受注残: ${item.order}　引当可能: ${avail}\n\n緊急アクション:\n▸ 即時発注を推奨\n▸ 推奨発注数: ${item.safety}（安全在庫量）\n▸ 得意先への納期調整が必要`;}
+    else if(item.ai==='warn'){tx+=`在庫水準が発注点を下回っています。\n現在庫: ${item.stock}　発注点: ${item.reorder}\n\n推奨アクション:\n▸ 今週中の発注を推奨\n▸ 在庫率: ${Math.round(item.stock/item.safety*100)}%（目標: 100%以上）`;}
+    else{tx+=`在庫水準は正常範囲内です。\n現在庫: ${item.stock}　引当可能: ${avail}\n在庫率: ${Math.round(item.stock/item.safety*100)}%\n\n引き続き監視します。`;}
+    addMsg('ai',tx,item.ai==='danger'?['今すぐ発注書作成','仕入先に連絡']:item.ai==='warn'?['発注計画に追加','詳細を確認']:[]);
+  },900);
+}
+function addMsg(type,text,actions=[]){
+  const area=document.getElementById('chat-area');
+  const d=document.createElement('div');
+  const cls=type==='ai'?'msg-ai':type==='user'?'msg-user':type==='warn'?'msg-warn':'msg-system';
+  const label=type==='ai'?'AIエージェント':type==='user'?'あなた':type==='warn'?'警告':'システム';
+  d.innerHTML=`<div class="msg-label">${label}</div><div class="msg ${cls}" style="white-space:pre-line">${text}</div>`;
+  if(actions.length){const r=document.createElement('div');r.className='action-row';actions.forEach(a=>{const b=document.createElement('button');b.className='act-btn';b.textContent=a;b.onclick=()=>quickAsk(a);r.appendChild(b);});d.appendChild(r);}
+  area.appendChild(d);area.scrollTop=area.scrollHeight;
+}
+function showThinking(){
+  const area=document.getElementById('chat-area');
+  const d=document.createElement('div');d.id='thinking';d.className='thinking';
+  d.innerHTML='<div class="ai-icon" style="width:20px;height:20px;font-size:10px">AI</div> 分析中 <span class="dots"><span>.</span><span>.</span><span>.</span></span>';
+  area.appendChild(d);area.scrollTop=area.scrollHeight;
+  document.getElementById('ai-dot').className='ai-dot thinking';
+  document.getElementById('ai-status-text').textContent='AIエージェント 分析中...';
+}
+function hideThinking(){
+  const t=document.getElementById('thinking');if(t)t.remove();
+  document.getElementById('ai-dot').className='ai-dot';
+  document.getElementById('ai-status-text').textContent='AIエージェント 稼働中';
+}
+function quickAsk(q){
+  if(thinking)return;thinking=true;
+  addMsg('user',q);showThinking();
+  const resp=responses[q];
+  setTimeout(()=>{
+    hideThinking();
+    if(resp){resp.forEach((r,i)=>{setTimeout(()=>{addMsg(r.t,r.tx,r.ac||[]);},i*300);});}
+    else{addMsg('ai',`「${q}」について在庫・仕入データを確認しました。\n各テーブルの行をクリックして個別分析もご利用ください。`);}
+    setTimeout(()=>{thinking=false;},600);
+  },1200);
+}
+function sendMsg(){
+  const inp=document.getElementById('chat-input');
+  const v=inp.value.trim();if(!v||thinking)return;inp.value='';
+  const m=Object.keys(responses).find(k=>v.includes(k.slice(0,4)));
+  quickAsk(m||v);
+}
+function runScan(){
+  if(thinking)return;thinking=true;
+  document.getElementById('scan-label').textContent='スキャン実行中...';
+  addMsg('system','全在庫・仕入データのAIスキャンを開始しました');showThinking();
+  setTimeout(()=>{
+    hideThinking();
+    addMsg('ai','スキャン完了。全42品目を分析しました。\n\n【サマリ】\n▸ 危険（即時対応）: 3件\n▸ 警告（今週中対応）: 7件\n▸ 仕入単価異常: 2件\n▸ AI発注推奨: 5件\n\n最も緊急度が高いのは D-5521 アルコール消毒液です。現在庫ゼロで受注残100本があります。',['D-5521を発注','全発注提案を表示']);
+    document.getElementById('scan-label').textContent='最終スキャン: 14:32';thinking=false;
+  },2000);
+}
+function filterDanger(){renderInv('danger');}
+function filterAll(){renderInv();}
+renderInv();renderPrices();
+setTimeout(()=>{
+  addMsg('system','AIエージェントが起動しました。在庫・仕入データを監視中です。');
+  setTimeout(()=>{addMsg('warn','警告: D-5521 アルコール消毒液 1L が在庫切れです（現在庫: 0本、受注残: 100本）',['今すぐ発注','詳細を確認']);},800);
+  setTimeout(()=>{addMsg('warn','警告: B-2310 除菌スプレーの仕入単価が先月比+17.9%上昇しています',['仕入先比較','見積を依頼']);},1400);
+},400);
+</script>
+</body>
+</html>
