@@ -1,1 +1,125 @@
-
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<title>在庫照会画面</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;font-family:'Meiryo','Yu Gothic',sans-serif}
+body{background:#f0f2f5;font-size:13px}
+.titlebar{background:#0F6E56;color:#fff;padding:8px 14px;display:flex;align-items:center;justify-content:space-between}
+.toolbar{background:#e8edf2;border-bottom:1px solid #c8d0d8;padding:6px 10px;display:flex;gap:6px;flex-wrap:wrap;align-items:center}
+.btn{background:#fff;border:1px solid #aab;border-radius:3px;padding:4px 12px;font-size:12px;cursor:pointer}
+.btn-teal{background:#0F6E56;color:#fff;border-color:#0F6E56}
+.search-bar{display:flex;gap:8px;align-items:center;padding:8px 10px;background:#e8f5f0;border-bottom:1px solid #c8d0d8;flex-wrap:wrap}
+.search-label{font-size:12px;color:#444;white-space:nowrap}
+.search-input{background:#fff;border:1px solid #aab;border-radius:3px;padding:4px 8px;font-size:12px}
+.metrics{display:grid;grid-template-columns:repeat(5,1fr);background:#fff;border-bottom:1px solid #c8d0d8}
+.metric{padding:10px 12px;border-right:1px solid #dde;text-align:center}
+.metric-label{font-size:11px;color:#666;margin-bottom:4px}
+.metric-val{font-size:18px;font-weight:bold}
+.ok{color:#1D9E75}.warn{color:#BA7517}.danger{color:#E24B4A}
+table{width:100%;border-collapse:collapse}
+th{background:#085041;color:#fff;padding:5px 8px;font-size:11px;text-align:center;border-right:1px solid #0F6E56}
+td{padding:5px 8px;font-size:12px;border-bottom:1px solid #dde;border-right:1px solid #dde;color:#222}
+tr:hover td{background:#e8f5f0}
+tr.warn-row td{background:#fff8e8}
+tr.danger-row td{background:#fff0f0}
+.num{text-align:right}.ct{text-align:center}
+.badge{display:inline-block;padding:2px 7px;border-radius:3px;font-size:11px;font-weight:bold}
+.b-ok{background:#c6efce;color:#276221}
+.b-warn{background:#ffeb9c;color:#9c6500}
+.b-danger{background:#ffc7ce;color:#9c0006}
+.bar-wrap{background:#ddd;border-radius:2px;height:6px;width:70px;overflow:hidden;display:inline-block;vertical-align:middle;margin-left:4px}
+.bar-fill{height:6px;border-radius:2px}
+.legend{display:flex;gap:16px;align-items:center;padding:6px 10px;font-size:11px;color:#666;border-top:1px solid #dde;background:#fff;flex-wrap:wrap}
+.leg-dot{width:12px;height:12px;border-radius:2px;display:inline-block;margin-right:4px;vertical-align:middle}
+.wtab-bar{display:flex;background:#f5f5f5;border-bottom:1px solid #c8d0d8}
+.wtab{padding:5px 14px;font-size:12px;cursor:pointer;border-bottom:3px solid transparent;color:#666}
+.wtab.active{color:#0F6E56;border-bottom-color:#0F6E56;font-weight:bold;background:#fff}
+</style>
+</head>
+<body>
+<div class="titlebar">
+  <span>商品当照会（在庫状況・引当可能数）</span>
+  <span style="font-size:11px;opacity:0.8">2026/04/10 14:32 更新</span>
+</div>
+<div class="toolbar">
+  <button class="btn btn-teal">Excel出力</button>
+  <button class="btn">印刷</button>
+  <button class="btn">自由集計</button>
+  <button class="btn">在庫移動</button>
+  <button class="btn">棚卸入力</button>
+  <div style="margin-left:auto;font-size:11px;color:#666">表示件数: 4件 / 全42件</div>
+</div>
+<div class="search-bar">
+  <span class="search-label">商品コード</span>
+  <input class="search-input" placeholder="例: A-1045">
+  <span class="search-label">カテゴリ</span>
+  <select class="search-input"><option>清掃用品</option><option>消毒・衛生</option></select>
+  <button class="btn btn-teal">検索</button>
+</div>
+<div class="wtab-bar">
+  <div class="wtab active">全倉庫</div>
+  <div class="wtab">第1倉庫</div>
+  <div class="wtab">第2倉庫</div>
+  <div class="wtab">預託在庫</div>
+</div>
+<div class="metrics">
+  <div class="metric"><div class="metric-label">総在庫金額</div><div class="metric-val">¥12,840,000</div></div>
+  <div class="metric"><div class="metric-label">在庫不足品目</div><div class="metric-val danger">3件</div></div>
+  <div class="metric"><div class="metric-label">発注点以下</div><div class="metric-val warn">7件</div></div>
+  <div class="metric"><div class="metric-label">期限管理品</div><div class="metric-val ok">24件</div></div>
+  <div class="metric"><div class="metric-label">引当済比率</div><div class="metric-val ok">87%</div></div>
+</div>
+<div style="overflow-x:auto;background:#fff;border:1px solid #dde;margin:8px">
+<table>
+  <thead><tr>
+    <th style="width:72px">品番</th><th style="width:170px">品名</th>
+    <th style="width:60px">現在庫</th><th style="width:60px">受注残</th>
+    <th style="width:60px">発注残</th><th style="width:60px">引当可能</th>
+    <th style="width:60px">適正在庫</th><th style="width:60px">発注点</th>
+    <th style="width:100px">在庫率</th><th style="width:80px">期限</th>
+  </tr></thead>
+  <tbody>
+    <tr>
+      <td style="color:#185FA5">A-1045</td><td>業務用クリーナーEX 5L</td>
+      <td class="num">280</td><td class="num">50</td><td class="num">0</td>
+      <td class="num ok" style="font-weight:bold">230</td>
+      <td class="num">200</td><td class="num">100</td>
+      <td><span style="font-size:11px;color:#276221">140%</span><div class="bar-wrap"><div class="bar-fill" style="width:100%;background:#1D9E75"></div></div></td>
+      <td style="font-size:11px;color:#666">—</td>
+    </tr>
+    <tr class="warn-row">
+      <td style="color:#185FA5">B-2310</td><td>除菌スプレー詰替 2L×6</td>
+      <td class="num">12</td><td class="num">20</td><td class="num">50</td>
+      <td class="num warn" style="font-weight:bold">0</td>
+      <td class="num">100</td><td class="num">30</td>
+      <td><span style="font-size:11px;color:#BA7517">12%</span><div class="bar-wrap"><div class="bar-fill" style="width:12%;background:#EF9F27"></div></div></td>
+      <td style="font-size:11px;color:#BA7517">2026/09/30</td>
+    </tr>
+    <tr>
+      <td style="color:#185FA5">C-0077</td><td>ウェットティッシュ業務用</td>
+      <td class="num">156</td><td class="num">30</td><td class="num">0</td>
+      <td class="num ok" style="font-weight:bold">126</td>
+      <td class="num">120</td><td class="num">60</td>
+      <td><span style="font-size:11px;color:#276221">130%</span><div class="bar-wrap"><div class="bar-fill" style="width:100%;background:#1D9E75"></div></div></td>
+      <td style="font-size:11px;color:#666">—</td>
+    </tr>
+    <tr class="danger-row">
+      <td style="color:#185FA5">D-5521</td><td>アルコール消毒液 1L</td>
+      <td class="num danger" style="font-weight:bold">0</td><td class="num">100</td><td class="num">200</td>
+      <td class="num danger" style="font-weight:bold">0</td>
+      <td class="num">300</td><td class="num">80</td>
+      <td><span style="font-size:11px;color:#E24B4A">0%</span><div class="bar-wrap"><div class="bar-fill" style="width:0%;background:#E24B4A"></div></div></td>
+      <td style="font-size:11px;color:#E24B4A">在庫切れ</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+<div class="legend">
+  <span><span class="leg-dot" style="background:#ffc7ce"></span>在庫切れ・受注対応不可</span>
+  <span><span class="leg-dot" style="background:#ffeb9c"></span>発注点以下・要注意</span>
+  <span><span class="leg-dot" style="background:#c6efce"></span>適正在庫範囲</span>
+</div>
+</body>
+</html>
