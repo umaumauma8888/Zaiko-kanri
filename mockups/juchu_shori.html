@@ -1,1 +1,102 @@
-file:///C:/Users/ei-li/Downloads/juchu_shori.html
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<title>受注処理画面</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;font-family:'Meiryo','Yu Gothic',sans-serif}
+body{background:#f0f2f5;font-size:13px}
+.titlebar{background:#185FA5;color:#fff;padding:8px 14px;display:flex;align-items:center;justify-content:space-between}
+.toolbar{background:#e8edf2;border-bottom:1px solid #c8d0d8;padding:6px 10px;display:flex;gap:6px;flex-wrap:wrap}
+.btn{background:#fff;border:1px solid #aab;border-radius:3px;padding:4px 12px;font-size:12px;cursor:pointer}
+.btn-primary{background:#185FA5;color:#fff;border-color:#185FA5}
+.form-grid{display:grid;grid-template-columns:repeat(4,1fr)}
+.field{padding:5px 8px;border-right:1px solid #dde;border-bottom:1px solid #dde;background:#fff}
+.field-label{font-size:10px;color:#666;margin-bottom:2px}
+.field-val{font-size:13px;font-weight:bold;color:#222}
+.tab-bar{display:flex;background:#f5f5f5;border-bottom:1px solid #c8d0d8;margin:0 8px}
+.tab{padding:6px 16px;font-size:12px;cursor:pointer;border-bottom:3px solid transparent;color:#666}
+.tab.active{color:#185FA5;border-bottom-color:#185FA5;font-weight:bold;background:#fff}
+table{width:100%;border-collapse:collapse}
+th{background:#0C447C;color:#fff;padding:5px 8px;font-size:11px;text-align:center;border-right:1px solid #185FA5}
+td{padding:5px 8px;font-size:12px;border-bottom:1px solid #dde;border-right:1px solid #dde}
+tr:hover td{background:#f0f6ff}
+tr.selected td{background:#daeaff}
+.num{text-align:right}.ct{text-align:center}
+.badge{display:inline-block;padding:2px 7px;border-radius:3px;font-size:11px;font-weight:bold}
+.b-full{background:#c6efce;color:#276221}
+.b-part{background:#ffeb9c;color:#9c6500}
+.b-none{background:#ffc7ce;color:#9c0006}
+.footer{display:grid;grid-template-columns:repeat(4,1fr);background:#fff;border-top:2px solid #185FA5;margin:0 8px 8px}
+.footer-cell{padding:10px 14px;border-right:1px solid #dde;text-align:center}
+.footer-label{font-size:11px;color:#666}
+.footer-val{font-size:17px;font-weight:bold}
+.total{color:#185FA5;font-size:20px}
+.info-bar{background:#dce6f0;border:1px solid #aac;margin:0 8px;padding:6px 10px;font-size:12px;color:#0C447C}
+</style>
+</head>
+<body>
+<div class="titlebar">
+  <span>受注処理　JO-2026-04823</span>
+  <span style="font-size:11px">2026/04/10</span>
+</div>
+<div class="toolbar">
+  <button class="btn btn-primary">新規</button>
+  <button class="btn">修正</button>
+  <button class="btn">削除</button>
+  <button class="btn">複写</button>
+  <button class="btn">前件</button>
+  <button class="btn">次件</button>
+  <button class="btn">出荷指示書</button>
+  <button class="btn">ピッキングリスト</button>
+  <button class="btn">発注連動</button>
+  <button class="btn btn-primary" style="margin-left:auto">売上計上</button>
+</div>
+<div class="form-grid" style="margin:8px 8px 0;border-left:1px solid #dde;border-top:1px solid #dde">
+  <div class="field"><div class="field-label">受注日</div><div class="field-val">2026/04/10</div></div>
+  <div class="field"><div class="field-label">受注番号</div><div class="field-val" style="color:#185FA5">JO-2026-04823</div></div>
+  <div class="field"><div class="field-label">納期</div><div class="field-val">2026/04/17</div></div>
+  <div class="field"><div class="field-label">担当者</div><div class="field-val">田中 翔太</div></div>
+  <div class="field" style="grid-column:span 2"><div class="field-label">得意先</div><div class="field-val">株式会社ミライ商事　<span style="font-size:11px;color:#666">T-00234</span></div></div>
+  <div class="field"><div class="field-label">届け先</div><div class="field-val">本社倉庫</div></div>
+  <div class="field"><div class="field-label">支払条件</div><div class="field-val">月末締翌月末払</div></div>
+  <div class="field" style="grid-column:span 2"><div class="field-label">摘要</div><div class="field-val">定期発注分 4月期</div></div>
+  <div class="field"><div class="field-label">倉庫</div><div class="field-val">第1倉庫</div></div>
+  <div class="field"><div class="field-label">受注区分</div><div class="field-val"><span class="badge b-part">一部出荷済</span></div></div>
+</div>
+<div class="tab-bar" style="margin-top:8px">
+  <div class="tab active">明細</div>
+  <div class="tab">在庫照会</div>
+  <div class="tab">納期・出荷状況</div>
+  <div class="tab">備考</div>
+</div>
+<div style="margin:0 8px;overflow-x:auto;background:#fff;border:1px solid #dde">
+<table>
+  <thead><tr>
+    <th style="width:36px">行</th><th style="width:80px">品番</th><th>品名</th>
+    <th style="width:52px">数量</th><th style="width:48px">単位</th>
+    <th style="width:72px">販売単価</th><th style="width:80px">金額</th>
+    <th style="width:64px">引当数</th><th style="width:64px">未引当</th><th style="width:80px">状態</th>
+  </tr></thead>
+  <tbody>
+    <tr class="selected"><td class="ct">1</td><td style="color:#185FA5">A-1045</td><td>業務用クリーナーEX 5L</td><td class="num">50</td><td class="ct">本</td><td class="num">¥1,980</td><td class="num">¥99,000</td><td class="num" style="color:#276221">50</td><td class="num">0</td><td class="ct"><span class="badge b-full">引当済</span></td></tr>
+    <tr><td class="ct">2</td><td style="color:#185FA5">B-2310</td><td>除菌スプレー詰替 2L×6</td><td class="num">20</td><td class="ct">箱</td><td class="num">¥4,500</td><td class="num">¥90,000</td><td class="num" style="color:#9c6500">12</td><td class="num" style="color:#9c0006">8</td><td class="ct"><span class="badge b-part">一部引当</span></td></tr>
+    <tr><td class="ct">3</td><td style="color:#185FA5">C-0077</td><td>ウェットティッシュ業務用</td><td class="num">30</td><td class="ct">ケース</td><td class="num">¥6,200</td><td class="num">¥186,000</td><td class="num" style="color:#276221">30</td><td class="num">0</td><td class="ct"><span class="badge b-full">引当済</span></td></tr>
+    <tr><td class="ct">4</td><td style="color:#185FA5">D-5521</td><td>アルコール消毒液 1L</td><td class="num">100</td><td class="ct">本</td><td class="num">¥890</td><td class="num">¥89,000</td><td class="num">0</td><td class="num" style="color:#9c0006">100</td><td class="ct"><span class="badge b-none">在庫不足</span></td></tr>
+  </tbody>
+</table>
+</div>
+<div class="info-bar">在庫不足 1品目 — 自動発注連動が可能です　|　受注同時発注: 有効</div>
+<div class="footer">
+  <div class="footer-cell"><div class="footer-label">小計</div><div class="footer-val">¥464,000</div></div>
+  <div class="footer-cell"><div class="footer-label">消費税(10%)</div><div class="footer-val">¥46,400</div></div>
+  <div class="footer-cell"><div class="footer-label">値引・調整</div><div class="footer-val">¥0</div></div>
+  <div class="footer-cell"><div class="footer-label">合計金額</div><div class="footer-val total">¥510,400</div></div>
+</div>
+<script>
+document.querySelectorAll('tbody tr').forEach(tr=>{
+  tr.onclick=()=>{document.querySelectorAll('tbody tr').forEach(r=>r.classList.remove('selected'));tr.classList.add('selected')};
+});
+</script>
+</body>
+</html>
