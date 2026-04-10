@@ -1,1 +1,112 @@
-
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<title>発注・仕入管理画面</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;font-family:'Meiryo','Yu Gothic',sans-serif}
+body{background:#f0f2f5;font-size:13px}
+.titlebar{background:#854F0B;color:#fff;padding:8px 14px;display:flex;align-items:center;justify-content:space-between}
+.toolbar{background:#e8edf2;border-bottom:1px solid #c8d0d8;padding:6px 10px;display:flex;gap:6px;flex-wrap:wrap}
+.btn{background:#fff;border:1px solid #aab;border-radius:3px;padding:4px 12px;font-size:12px;cursor:pointer}
+.btn-amber{background:#854F0B;color:#fff;border-color:#854F0B}
+.form-grid{display:grid;grid-template-columns:repeat(4,1fr)}
+.field{padding:5px 8px;border-right:1px solid #dde;border-bottom:1px solid #dde;background:#fff}
+.field-label{font-size:10px;color:#666;margin-bottom:2px}
+.field-val{font-size:13px;font-weight:bold;color:#222}
+table{width:100%;border-collapse:collapse}
+th{background:#633806;color:#fff;padding:5px 8px;font-size:11px;text-align:center;border-right:1px solid #854F0B}
+td{padding:5px 8px;font-size:12px;border-bottom:1px solid #dde;border-right:1px solid #dde;color:#222}
+tr:hover td{background:#fdf5e8}
+.num{text-align:right}.ct{text-align:center}
+.badge{display:inline-block;padding:2px 7px;border-radius:3px;font-size:11px;font-weight:bold}
+.b-wait{background:#ffeb9c;color:#9c6500}
+.b-done{background:#c6efce;color:#276221}
+.b-part{background:#dce6f0;color:#0C447C}
+.split{display:grid;grid-template-columns:1fr 1fr;border-top:1px solid #dde}
+.panel{border-right:1px solid #dde}
+.panel:last-child{border-right:none}
+.panel-hd{background:#f5f0e8;padding:5px 10px;font-size:11px;font-weight:bold;color:#633806;border-bottom:1px solid #dde}
+.stbl{width:100%;border-collapse:collapse}
+.stbl td{padding:4px 10px;font-size:12px;border-bottom:1px solid #eee;color:#222}
+.footer{display:grid;grid-template-columns:repeat(3,1fr);background:#fff;border-top:2px solid #854F0B;margin:0 8px 8px}
+.footer-cell{padding:10px 14px;border-right:1px solid #dde;text-align:center}
+.footer-label{font-size:11px;color:#666}
+.footer-val{font-size:17px;font-weight:bold;color:#222}
+.total{color:#854F0B;font-size:20px}
+</style>
+</head>
+<body>
+<div class="titlebar">
+  <span>一括発注処理</span>
+  <span style="font-size:11px;opacity:0.85">発注日: 2026/04/10　仕入先: 3社</span>
+</div>
+<div class="toolbar">
+  <button class="btn btn-amber">発注書発行</button>
+  <button class="btn">入荷指示書</button>
+  <button class="btn">発注残照会</button>
+  <button class="btn">適正在庫割れ自動抽出</button>
+  <button class="btn">複数仕入先一括</button>
+  <button class="btn btn-amber" style="margin-left:auto">仕入確定</button>
+</div>
+<div class="form-grid" style="margin:8px 8px 0;border-left:1px solid #dde;border-top:1px solid #dde">
+  <div class="field"><div class="field-label">発注日</div><div class="field-val">2026/04/10</div></div>
+  <div class="field"><div class="field-label">発注番号</div><div class="field-val" style="color:#854F0B">PO-2026-01234</div></div>
+  <div class="field"><div class="field-label">希望納期</div><div class="field-val">2026/04/17</div></div>
+  <div class="field"><div class="field-label">担当者</div><div class="field-val">鈴木 一郎</div></div>
+  <div class="field" style="grid-column:span 2"><div class="field-label">仕入先</div><div class="field-val">山田商事株式会社　<span style="font-size:11px;color:#666">S-00089</span></div></div>
+  <div class="field"><div class="field-label">支払条件</div><div class="field-val">翌月末払い</div></div>
+  <div class="field"><div class="field-label">発注区分</div><div class="field-val"><span class="badge b-part">納期回答待ち</span></div></div>
+</div>
+<div style="margin:0 8px;overflow-x:auto;background:#fff;border:1px solid #dde">
+<table>
+  <thead><tr>
+    <th style="width:36px">行</th><th style="width:76px">品番</th><th>品名</th>
+    <th style="width:60px">発注数</th><th style="width:48px">単位</th>
+    <th style="width:72px">仕入単価</th><th style="width:80px">発注金額</th>
+    <th style="width:72px">希望納期</th><th style="width:90px">回答納期</th>
+  </tr></thead>
+  <tbody>
+    <tr>
+      <td class="ct">1</td><td style="color:#854F0B">B-2310</td><td>除菌スプレー詰替 2L×6</td>
+      <td class="num">50</td><td class="ct">箱</td><td class="num">¥3,200</td><td class="num">¥160,000</td>
+      <td class="ct" style="font-size:11px">04/17</td><td class="ct"><span class="badge b-wait">未回答</span></td>
+    </tr>
+    <tr>
+      <td class="ct">2</td><td style="color:#854F0B">D-5521</td><td>アルコール消毒液 1L</td>
+      <td class="num">200</td><td class="ct">本</td><td class="num">¥620</td><td class="num">¥124,000</td>
+      <td class="ct" style="font-size:11px">04/17</td><td class="ct"><span class="badge b-part" style="font-size:11px">04/14 (100本)</span></td>
+    </tr>
+    <tr>
+      <td class="ct">3</td><td style="color:#854F0B">E-3301</td><td>ポリ手袋 Mサイズ 100枚×20箱</td>
+      <td class="num">10</td><td class="ct">ケース</td><td class="num">¥4,800</td><td class="num">¥48,000</td>
+      <td class="ct" style="font-size:11px">04/17</td><td class="ct"><span class="badge b-done">04/16確定</span></td>
+    </tr>
+  </tbody>
+</table>
+</div>
+<div class="split" style="margin:0 8px;background:#fff;border:1px solid #dde;border-top:none">
+  <div class="panel">
+    <div class="panel-hd">発注残照会（仕入先別）</div>
+    <table class="stbl">
+      <tr><td>山田商事</td><td class="num">3品目</td><td class="num">¥332,000</td></tr>
+      <tr><td>東西物産</td><td class="num">2品目</td><td class="num">¥186,000</td></tr>
+      <tr><td>中部ケミカル</td><td class="num">1品目</td><td class="num">¥98,000</td></tr>
+    </table>
+  </div>
+  <div class="panel">
+    <div class="panel-hd">仕入処理状況（今月）</div>
+    <table class="stbl">
+      <tr><td><span class="badge b-done">確定済</span></td><td class="num">18件</td><td class="num">¥2,340,000</td></tr>
+      <tr><td><span class="badge b-part">入荷待</span></td><td class="num">6件</td><td class="num">¥616,000</td></tr>
+      <tr><td><span class="badge b-wait">未着手</span></td><td class="num">3件</td><td class="num">¥332,000</td></tr>
+    </table>
+  </div>
+</div>
+<div class="footer">
+  <div class="footer-cell"><div class="footer-label">今回発注金額</div><div class="footer-val">¥332,000</div></div>
+  <div class="footer-cell"><div class="footer-label">消費税 (10%)</div><div class="footer-val">¥33,200</div></div>
+  <div class="footer-cell"><div class="footer-label">合計（税込）</div><div class="footer-val total">¥365,200</div></div>
+</div>
+</body>
+</html>
