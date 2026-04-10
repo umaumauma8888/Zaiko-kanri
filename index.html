@@ -1,1 +1,136 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<title>販売・在庫・購買管理システム モックアップ集</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;font-family:'Meiryo','Yu Gothic',sans-serif}
+body{background:#f0f2f5;padding:24px}
+.header{background:#185FA5;color:#fff;padding:20px 28px;border-radius:8px;margin-bottom:24px}
+.header h1{font-size:20px;margin-bottom:6px}
+.header p{font-size:13px;opacity:0.85}
+.badges{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap}
+.badge{background:rgba(255,255,255,0.2);padding:3px 10px;border-radius:20px;font-size:11px}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:16px}
+.card{background:#fff;border:1px solid #c8d0d8;border-radius:8px;overflow:hidden;text-decoration:none;color:#222;display:block;transition:transform 0.1s}
+.card:hover{transform:translateY(-2px);border-color:#185FA5}
+.card-header{padding:14px 16px;color:#fff;font-size:14px;font-weight:bold}
+.card-body{padding:14px 16px}
+.card-desc{font-size:12px;color:#444;line-height:1.7;margin-bottom:12px}
+.card-tags{display:flex;gap:6px;flex-wrap:wrap}
+.tag{background:#e8f0fb;color:#185FA5;padding:2px 8px;border-radius:4px;font-size:11px;font-weight:bold}
+.tag.green{background:#e8f5e8;color:#276221}
+.tag.amber{background:#fff5e0;color:#854F0B}
+.tag.purple{background:#f0eeff;color:#3C3489}
+.card-footer{padding:10px 16px;background:#f8f9fa;border-top:1px solid #e8edf2;font-size:12px;color:#185FA5;font-weight:bold}
+.section-title{font-size:13px;font-weight:bold;color:#666;margin:24px 0 12px;padding-bottom:6px;border-bottom:1px solid #dde}
+</style>
+</head>
+<body>
 
+<div class="header">
+  <h1>販売・在庫・購買管理システム モックアップ集</h1>
+  <p>IT導入補助金2026 申請用デモ画面　|　umaumauma8888/Zaiko-kanri</p>
+  <div class="badges">
+    <span class="badge">共P-01 顧客対応・販売支援</span>
+    <span class="badge">共P-02 決済・債権債務</span>
+    <span class="badge">共P-03 供給・在庫・物流</span>
+    <span class="badge">AI機能搭載（異常検知・予測）</span>
+    <span class="badge">インボイス対応</span>
+  </div>
+</div>
+
+<div class="section-title">業務画面モックアップ（全5画面）</div>
+
+<div class="grid">
+
+  <a class="card" href="mockups/juchu_shori.html">
+    <div class="card-header" style="background:#185FA5">受注処理画面</div>
+    <div class="card-body">
+      <div class="card-desc">
+        見積〜受注〜売上計上までの一連フローを管理。在庫引当状況をリアルタイム表示し、在庫不足時は自動発注連動が可能。過去明細からの複写・受注同時発注にも対応。
+      </div>
+      <div class="card-tags">
+        <span class="tag">共P-01</span>
+        <span class="tag">共P-02</span>
+        <span class="tag green">引当管理</span>
+        <span class="tag green">発注連動</span>
+      </div>
+    </div>
+    <div class="card-footer">画面を開く →</div>
+  </a>
+
+  <a class="card" href="mockups/zaiko_shokai.html">
+    <div class="card-header" style="background:#0F6E56">在庫照会画面</div>
+    <div class="card-body">
+      <div class="card-desc">
+        倉庫別在庫・発注点・適正在庫・期限管理を一元表示。在庫不足・発注点割れを色分けで即時把握。Excel出力・自由集計にも対応。
+      </div>
+      <div class="card-tags">
+        <span class="tag">共P-03</span>
+        <span class="tag green">在庫管理</span>
+        <span class="tag green">期限管理</span>
+        <span class="tag green">Excel出力</span>
+      </div>
+    </div>
+    <div class="card-footer">画面を開く →</div>
+  </a>
+
+  <a class="card" href="mockups/hacchu_shiire.html">
+    <div class="card-header" style="background:#854F0B">発注・仕入管理画面</div>
+    <div class="card-body">
+      <div class="card-desc">
+        複数仕入先への一括発注・納期回答管理・発注残照会を統合管理。適正在庫割れ商品の自動抽出で発注漏れを防止。
+      </div>
+      <div class="card-tags">
+        <span class="tag">共P-03</span>
+        <span class="tag amber">発注管理</span>
+        <span class="tag amber">仕入管理</span>
+        <span class="tag amber">納期管理</span>
+      </div>
+    </div>
+    <div class="card-footer">画面を開く →</div>
+  </a>
+
+  <a class="card" href="mockups/seikyu_nyukin.html">
+    <div class="card-header" style="background:#3C3489">請求・入金管理画面</div>
+    <div class="card-body">
+      <div class="card-desc">
+        締日単位での請求計算・インボイス対応請求書の自動発行。入金状況を一覧管理し、未入金・一部入金を色分け表示。回収率をリアルタイム集計。
+      </div>
+      <div class="card-tags">
+        <span class="tag">共P-02</span>
+        <span class="tag purple">インボイス対応</span>
+        <span class="tag purple">入金管理</span>
+        <span class="tag purple">回収管理</span>
+      </div>
+    </div>
+    <div class="card-footer">画面を開く →</div>
+  </a>
+
+  <a class="card" href="mockups/ai_agent_dashboard.html">
+    <div class="card-header" style="background:#26215C">AIエージェント画面</div>
+    <div class="card-body">
+      <div class="card-desc">
+        AIが在庫不足・仕入単価異常をリアルタイム検知。自然言語での質問に即座に回答し、発注提案・仕入予測を自動生成。生成AI以外のAI技術（分類・予測・異常検知）を搭載。
+      </div>
+      <div class="card-tags">
+        <span class="tag">共P-03</span>
+        <span class="tag purple">AI搭載</span>
+        <span class="tag purple">異常検知</span>
+        <span class="tag purple">発注予測</span>
+      </div>
+    </div>
+    <div class="card-footer">画面を開く →</div>
+  </a>
+
+</div>
+
+<div style="margin-top:32px;padding:16px;background:#fff;border:1px solid #c8d0d8;border-radius:8px;font-size:12px;color:#666;line-height:1.8">
+  <strong style="color:#222">IT導入補助金2026 対応プロセス</strong><br>
+  共P-01（顧客対応・販売支援）／共P-02（決済・債権債務・資金回収）／共P-03（供給・在庫・物流）<br>
+  インボイス対応（受発注機能）／AI機能（生成AI以外：分類・予測・異常検知）
+</div>
+
+</body>
+</html>
